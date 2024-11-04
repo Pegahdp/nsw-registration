@@ -1,12 +1,14 @@
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { supabase } from "../lib/supabaseClient";
-import logo from "../logo.png";
+import logo from "../img/logo.png";
 import GoogleLogo from "../img/google-logo.png";
 import NSWBg from "../img/NSW-Government-bg.svg";
+import { useEffect } from "react";
 
 export default function Signup() {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -29,6 +31,26 @@ export default function Signup() {
       console.error("Unexpected error:", error);
     }
   };
+
+  const handleGoogleSignIn = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+
+    if (error) {
+      console.error("Error with Google sign-in:", error.message);
+    } else {
+      console.log("Google sign-in successful!");
+    }
+  };
+
+  useEffect(() => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN") {
+        navigate("/account");
+      }
+    });
+  }, [navigate]);
 
   return (
     <div className="w-full h-screen md:bg-[#FBE9E9] md:flex md:items-center md:justify-center ">
@@ -113,10 +135,13 @@ export default function Signup() {
             <p className="text-[11px] text-[#6d6d6d]">Or</p>
             <div className="border flex-1"></div>
           </div>
-          <div className="w-full flex items-center justify-center gap-1 rounded-md border text-[#6d6d6d] cursor-pointer p-2.5  transition-all hover:bg-[#bd2b35] hover:text-white">
+          <button
+            onClick={handleGoogleSignIn}
+            className="w-full flex items-center justify-center gap-1 rounded-md border text-[#6d6d6d] p-2.5  transition-all hover:bg-[#bd2b35] hover:text-white"
+          >
             <img src={GoogleLogo} className="w-6" />
             <p className="text-sm"> Continue with Google</p>
-          </div>
+          </button>
 
           <p className="text-[15px] mt-20 md:mt-10 text-[#6d6d6d] text-center">
             Already have an account?{" "}
