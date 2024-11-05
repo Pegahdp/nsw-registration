@@ -6,7 +6,7 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); 
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   const signUp = async (formData) => {
@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const signIn = async (formData) => {
-    setIsLoading(true); 
+    setIsLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: formData.email,
@@ -37,13 +37,13 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       alert(error.message);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    navigate("/");
+    navigate("/signin");
   };
 
   const signInWithGoogle = async () => {
