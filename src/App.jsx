@@ -1,18 +1,36 @@
-import { Routes, Route } from "react-router-dom";
-import Signup from "./components/Signup";
-import Signin from "./components/Signin";
-import Account from "./components/Account";
-import { useEffect, useState } from "react";
-import Confirmation from "./pages/Confirmation";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import Signup from "./pages/Signup";
+import Signin from "./pages/Signin";
+import Account from "./pages/Account";
+import { AuthProvider, useAuth } from "./AuthContext";
+
+function RedirectIfLoggedIn({ children }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  if (user) {
+    navigate("/account");
+    return null;
+  }
+  return children;
+}
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Signup />} />
-      <Route path="/signin" element={<Signin />} />
-      <Route path="/account" element={<Account />} />
-      <Route path="/confirmation" element={<Confirmation />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<Signup />} />
+        <Route
+          path="/signin"
+          element={
+            <RedirectIfLoggedIn>
+              <Signin />
+            </RedirectIfLoggedIn>
+          }
+        />
+        <Route path="/account" element={<Account />} />
+      </Routes>
+    </AuthProvider>
   );
 }
 

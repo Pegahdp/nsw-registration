@@ -1,56 +1,23 @@
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-import { supabase } from "../lib/supabaseClient";
 import logo from "../img/logo.png";
 import GoogleLogo from "../img/google-logo.png";
 import NSWBg from "../img/NSW-Government-bg.svg";
-import { useEffect } from "react";
+import Spinner from "../components/Spinner";
+import { useAuth } from "../AuthContext";
 
-export default function Signup() {
-  const navigate = useNavigate();
+export default function Signin() {
+  const { isLoading, signIn, signInWithGoogle } = useAuth();
   const {
     register,
     handleSubmit,
-    reset,
-    formState: { errors: formDataErrors, isLoading },
+
+    formState: { errors: formDataErrors },
   } = useForm();
-
   const onSubmit = async (formData) => {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-      });
-
-      alert("check your email for verification email");
-      if (error) {
-        console.log("Sign-up error:", error.message);
-      }
-    } catch (error) {
-      console.error("Unexpected error:", error);
-    }
+    signIn(formData);
   };
-
-  const handleGoogleSignIn = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-    });
-
-    if (error) {
-      console.error("Error with Google sign-in:", error.message);
-    } else {
-      console.log("Google sign-in successful!");
-    }
-  };
-
-  useEffect(() => {
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN") {
-        navigate("/account");
-      }
-    });
-  }, [navigate]);
 
   return (
     <div className="w-full h-screen md:bg-[#FBE9E9] md:flex md:items-center md:justify-center ">
@@ -60,7 +27,7 @@ export default function Signup() {
             <img src={logo} alt="" className="mb-8" />
           </div>
           <p className="text-lg text-[#6d6d6d] mt-20 md:mt-16 mb-4">
-            Create your account
+            Log in to your account
           </p>
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -120,9 +87,9 @@ export default function Signup() {
 
             <button
               type="submit"
-              className="w-full mx-auto mt-1  bg-nswRed text-white px-4 py-2 rounded-md transition-all hover:bg-[#bd2b35]"
+              className="w-full flex items-center justify-center mx-auto mt-1  bg-nswRed text-white px-4 py-2 rounded-md transition-all hover:bg-[#bd2b35]"
             >
-              Register
+              {!isLoading ? "Log in" : <Spinner />}
             </button>
           </form>
           <p className="text-[11px] text-[#3c3d3d] mt-2">
@@ -136,17 +103,17 @@ export default function Signup() {
             <div className="border flex-1"></div>
           </div>
           <button
-            onClick={handleGoogleSignIn}
-            className="w-full flex items-center justify-center gap-1 rounded-md border text-[#6d6d6d] p-2.5  transition-all hover:bg-[#bd2b35] hover:text-white"
+            onClick={signInWithGoogle}
+            className="w-full flex items-center justify-center gap-1 rounded-md border text-[#6d6d6d] cursor-pointer p-2.5  transition-all hover:bg-[#bd2b35] hover:text-white"
           >
             <img src={GoogleLogo} className="w-6" />
-            <p className="text-sm"> Continue with Google</p>
+            <p className="text-sm"> Sign in with Google</p>
           </button>
 
           <p className="text-[15px] mt-20 md:mt-10 text-[#6d6d6d] text-center">
-            Already have an account?{" "}
+            No account?{" "}
             <span className="text-nswRed">
-              <Link to="/signin">Log in</Link>
+              <Link to="/">Create one!</Link>
             </span>
           </p>
         </div>
